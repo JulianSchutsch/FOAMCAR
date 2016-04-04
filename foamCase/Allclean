@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Source tutorial clean functions
+. $WM_PROJECT_DIR/bin/tools/CleanFunctions
+
+# remove surface and features
+\rm -f constant/triSurface/ahmed.obj.gz > /dev/null 2>&1
+\rm -rf constant/extendedFeatureEdgeMesh > /dev/null 2>&1
+\rm -f constant/triSurface/ahmed.eMesh > /dev/null 2>&1
+
+rm -rf 0 > /dev/null 2>&1
+
+cleanCase

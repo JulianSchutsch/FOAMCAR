@@ -1,0 +1,5 @@
+flowVelocity (99.270510 -28.531695 0.000000);
+vehicleVelocity (90.000000 0.000000 0.000000);
+pressure 0;
+turbulentKE 0.24;
+turbulentOmega 1.78;

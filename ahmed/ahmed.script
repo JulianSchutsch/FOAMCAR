@@ -1,0 +1,102 @@
+units m
+
+set width 0.389
+set height 0.288
+set length 1.044
+set postHeight 0.05
+set postRadius 0.015
+set frontRoundRadius 0.100
+set mainLength [expr {$length-$frontRoundRadius}]
+set postx1 [expr {$length-0.202}]
+set posty1 -0.1635
+set postx2 [expr {$length-0.202-0.47}]
+set posty2 0.1635
+set postHeight 0.05
+set right [expr {$width/2}]
+set left [expr {-$width/2}]
+set bottom $postHeight
+set top [expr {$bottom+$height}]
+set front $length
+set back 0
+set secondFront [expr {$front-$frontRoundRadius}]
+set secondLeft [expr {$left+$frontRoundRadius}]
+set secondRight [expr {$right-$frontRoundRadius}]
+set secondTop [expr {$top-$frontRoundRadius}]
+set secondBottom [expr {$bottom+$frontRoundRadius}]
+
+set pi [expr acos(-1)]
+set slantAngle [expr {25*$pi/180}]
+set slantHypothenuse 0.220
+set slantCos [expr {cos($slantAngle)*$slantHypothenuse}]
+set slantSin [expr {sin($slantAngle)*$slantHypothenuse}]
+
+set secondBack [expr {$back+$slantCos}]
+set slantTop [expr {$top-$slantSin}]
+
+set postBottom 0
+set postTop $postHeight
+
+#kill ahmed_mainblock.s
+in ahmed_mainblock.s arb8   $front $left $bottom   $front $right $bottom   $back $right $bottom   $back $left $bottom\
+                            $front $left $top      $front $right $top      $back $right $top      $back $left $top
+
+#kill ahmed_frontTopRcc.s
+in ahmed_frontTopRcc.s rcc      $secondFront $left $secondTop   0 $width 0   $frontRoundRadius
+#kill ahmed_frontBottomRcc.s
+in ahmed_frontBottomRcc.s rcc   $secondFront $left $secondBottom   0 $width 0   $frontRoundRadius
+#kill ahmed_frontLeftRcc.s
+in ahmed_frontLeftRcc.s rcc     $secondFront $secondLeft $bottom   0 0 $height   $frontRoundRadius
+#kill ahmed_frontRightRcc.s
+in ahmed_frontRightRcc.s rcc    $secondFront $secondRight $bottom    0 0 $height   $frontRoundRadius
+
+#kill ahmed_frontTopArb8.s
+in ahmed_frontTopArb8.s arb8    $front $left $secondTop   $front $right $secondTop   $secondFront $right $secondTop   $secondFront $left $secondTop\
+                                $front $left $top         $front $right $top         $secondFront $right $top         $secondFront $left $top
+#kill ahmed_frontLeftArb8.s
+in ahmed_frontLeftArb8.s arb8   $front $left $bottom      $front $secondLeft $bottom   $secondFront $secondLeft $bottom   $secondFront $left $bottom\
+                                $front $left $top         $front $secondLeft $top      $secondFront $secondLeft $top      $secondFront $left $top
+
+#kill ahmed_frontRightArb8.s
+in ahmed_frontRightArb8.s arb8  $front $secondRight $bottom   $front $right $bottom   $secondFront $right $bottom   $secondFront $secondRight $bottom\
+                                $front $secondRight $top      $front $right $top      $secondFront $right $top      $secondFront $secondRight $top
+
+#kill ahmed_frontBottomArb8.s
+in ahmed_frontBottomArb8.s arb8  $front $left $bottom         $front $right $bottom         $secondFront $right $bottom         $secondFront $left $bottom\
+                                 $front $left $secondBottom   $front $right $secondBottom   $secondFront $right $secondBottom   $secondFront $left $secondBottom
+
+#kill ahmed_slant.s
+in ahmed_slant.s arb8  $back $left $top   $back $right $top    $secondBack $right $top  $secondBack $left $top\
+                       $back $left $slantTop   $back $right $slantTop    $secondBack $right $top  $secondBack $left $top
+
+#kill ahmed_frontTopMask.r
+r ahmed_frontTopMask.r u ahmed_frontTopArb8.s - ahmed_frontTopRcc.s
+#kill ahmed_frontLeftMask.r
+r ahmed_frontLeftMask.r u ahmed_frontLeftArb8.s - ahmed_frontLeftRcc.s
+#kill ahmed_frontRightMask.r
+r ahmed_frontRightMask.r u ahmed_frontRightArb8.s - ahmed_frontRightRcc.s
+#kill ahmed_frontBottomMask.r
+r ahmed_frontBottomMask.r u ahmed_frontBottomArb8.s - ahmed_frontBottomRcc.s
+
+#kill ahmed_frontMask.c
+g ahmed_frontMask.c ahmed_frontTopMask.r ahmed_frontLeftMask.r ahmed_frontRightMask.r ahmed_frontBottomMask.r ahmed_slant.s
+#kill body.r
+r body.r u ahmed_mainblock.s - ahmed_frontMask.c
+#kill ahmed_post1.s
+in ahmed_post1.s rcc   $postx1 $posty1 $postBottom   0 0 $postHeight   $postRadius
+#kill ahmed_post2.s
+in ahmed_post2.s rcc   $postx1 $posty2 $postBottom   0 0 $postHeight   $postRadius
+#kill ahmed_post3.s
+in ahmed_post3.s rcc   $postx2 $posty1 $postBottom   0 0 $postHeight   $postRadius
+#kill ahmed_post4.s
+in ahmed_post4.s rcc   $postx2 $posty2 $postBottom   0 0 $postHeight   $postRadius
+
+#kill ahmed.c
+g ahmed.c body.r ahmed_post1.s ahmed_post2.s ahmed_post3.s ahmed_post4.s
+
+B ahmed.c
+
+oed / ahmed.c/body.r/ahmed_mainblock.s
+keypoint 0.522 0 0
+rot 0 0 180
+tra -0.522 0 0
+accept
