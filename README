@@ -1,0 +1,47 @@
+--- OpenFOAM race car adapter ---
+
+This program creates steady state OpenFOAM simulations for several wind
+attack angles.
+
+Warning: This all expects a linux system with OpenFOAM and Python 3 installed.
+
+Components:
+
+ 1. Ahmed example body generator.
+  
+  BRLCAD [brlcad] is used to generate an ahmed body using
+  data from paper [Bordei, Poescu].
+
+  Invoke using:
+
+   make ahmed
+
+ 2. Simulation files
+
+  Based on the motorBike example from OpenFOAM. Some key parts are
+  overwritten by the generator module.
+
+  Do not invoke directly since it depends on generated files.
+
+ 3. Simulation generator
+
+  Generates OpenFOAM files for several vehicle directions, wind directions
+  and wind speeds. Invokes the Simulation files automatically.
+
+  Example: Invoke as part of a job as:
+
+   generator$ python3 calculate.py --windAngle 0.1 --windSpeed 10 20\
+                --vehicleSpeed 0
+
+  This will calculate for all combinations of wind angle, wind speed and
+  vehicle speed.
+
+ 4. Coefficient library
+
+  The public interface in "interpolation.py" permits easy access to Delaunay
+  interpolated data.
+
+References:
+[brlcad] See http://brlcad.org
+[Bordei, Peoscu] Stefan Bordei, Florin Popescu; Aerodynamic Results for a Notchback Race Car;
+ The Annals Of “DUNĂREA DE JOS” UNIVERSITY OF GALAŢIFASCICLE V, TECHNOLOGIES IN MACHINE BUILDING, ISSN 1221- 4566, 201
